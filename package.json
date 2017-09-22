@@ -1,0 +1,19 @@
+{
+  "name": "filmik",
+  "version": "1.0.0",
+  "description": "Création d'un bot Messanger - WebService",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "keywords": [
+    "'BotMessanger'",
+    "'RESTful'"
+  ],
+  "author": "Barabé Pierre",
+  "license": "ISC",
+  "dependencies": {
+    "messenger-bot": "^2.4.0"
+  }
+}
