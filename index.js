@@ -1,32 +1,35 @@
-'use strict'
+"use strict";
+require('dotenv').config();
 
-const express = require('express')
-const bodyParser = require('body-parser')
-const request = require('request')
-const app = express()
+const http = require('http')
+const Bot = require('messenger-bot')
 
-app.set('port', (process.env.PORT || 5000))
+const FB_TOKEN = 'EAAB1tldprnoBAEtBHWZBasAVh4fiTQybBvU8ufWehkUPkbIhTpZCRIGW74GrYddNMD4vcVS7k7ACwSSwEiVvjRzZBWFU0cB1S8rvUVBUfMb67MQip3NtDpCp9CJtmbqZBoAF9bcXGg5Aak8dZBKJ5cXjCjc0a5PIrEQHaYZASFDAZDZD'
+const FB_VERIFY = 'je_suis_un_panda'
 
-// Process application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({extended: false}))
+console.log(FB_TOKEN + " " + FB_VERIFY)
 
-// Process application/json
-app.use(bodyParser.json())
-
-// Index route
-app.get('/', function (req, res) {
-	res.send('Hello world, I am a chat bot')
+let bot = new Bot({
+    token: FB_TOKEN,
+    verify: FB_VERIFY
 })
 
-// for Facebook verification
-app.get('/webhook/', function (req, res) {
-	if (req.query['hub.verify_token'] === 'je_suis_un_panda') {
-		res.send(req.query['hub.challenge'])
-	}
-	res.send('Error, wrong token')
+
+bot.on('error', (err) => {
+    console.log(err.message)
 })
 
-// Spin up the server
-app.listen(app.get('port'), function() {
-	console.log('running on port', app.get('port'))
+bot.on('message', (payload, reply) => {
+    let text = payload.message.text
+    reply({
+        text
+    }, (err) => {
+        if (err) {
+            console.log(err.message)
+        }
+
+        console.log(`Echoed back : ${text}`)
+    })
 })
+http.createServer(bot.middleware()).listen(5000)
+console.log('Server is running.')
