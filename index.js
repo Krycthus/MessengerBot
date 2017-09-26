@@ -4,10 +4,12 @@ require('dotenv').config();
 const http = require('http')
 const Bot = require('messenger-bot')
 
-const FB_TOKEN = 'EAAB1tldprnoBAEtBHWZBasAVh4fiTQybBvU8ufWehkUPkbIhTpZCRIGW74GrYddNMD4vcVS7k7ACwSSwEiVvjRzZBWFU0cB1S8rvUVBUfMb67MQip3NtDpCp9CJtmbqZBoAF9bcXGg5Aak8dZBKJ5cXjCjc0a5PIrEQHaYZASFDAZDZD'
-const FB_VERIFY = 'je_suis_un_panda'
+const FB_TOKEN = process.env.FB_TOKEN
+const FB_VERIFY = process.env.FB_VERIFY
 
-console.log(FB_TOKEN + " " + FB_VERIFY)
+if (!FB_TOKEN || !FB_VERIFY){
+    throw "Vous n'avez pas le fichier .env créé avec les variables d'authetification. C'est Basique, Simple !"
+}
 
 let bot = new Bot({
     token: FB_TOKEN,
@@ -20,6 +22,8 @@ bot.on('error', (err) => {
 })
 
 bot.on('message', (payload, reply) => {
+  console.log(payload);
+  console.log(reply);
     let text = payload.message.text
     reply({
         text
