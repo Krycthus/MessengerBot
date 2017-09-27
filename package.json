@@ -1,0 +1,24 @@
+{
+  "name": "filmik",
+  "version": "1.0.0",
+  "description": "Création d'un bot Messanger - WebService",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/server/webhooks.js"
+  },
+  "keywords": [
+    "'BotMessanger'",
+    "'RESTful'"
+  ],
+  "author": "Barabé Pierre",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "dotenv": "^4.0.0",
+    "express": "^4.15.4",
+    "messenger-bot": "^2.4.0",
+    "ngrok": "^2.2.22",
+    "request": "^2.82.0"
+  }
+}
