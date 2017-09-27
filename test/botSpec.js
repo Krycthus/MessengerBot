@@ -1,0 +1,17 @@
+/*Exemples*/
+var assert = require('assert');
+describe('Array', function() {
+  describe('#indexOf()', function() {
+    it('should return -1 when the value is not present', function() {
+      assert.equal(-1, [1,2,3].indexOf(4));
+    });
+  });
+});
+
+describe('Connection', function() {
+  describe('test01', function() {
+    it('Ceci est un test', function() {
+      assert.equal(2, 1+1)
+    })
+  })
+})

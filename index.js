@@ -1,39 +1,16 @@
-"use strict";
 require('dotenv').config();
+const express = require('express')
+const bodyParser = require('body-parser');
+const request = require('request');
+const app = express();
 
-const http = require('http')
-const Bot = require('messenger-bot')
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-const FB_TOKEN = process.env.FB_TOKEN
-const FB_VERIFY = process.env.FB_VERIFY
+const routes = require('./src/api/routes/messageRoutes.js');
+console.log(routes);
+routes(app);
 
-if (!FB_TOKEN || !FB_VERIFY){
-    throw "Vous n'avez pas le fichier .env créé avec les variables d'authetification. C'est Basique, Simple !"
-}
-
-let bot = new Bot({
-    token: FB_TOKEN,
-    verify: FB_VERIFY
-})
-
-
-bot.on('error', (err) => {
-    console.log(err.message)
-})
-
-bot.on('message', (payload, reply) => {
-  console.log(payload);
-  console.log(reply);
-    let text = payload.message.text
-    reply({
-        text
-    }, (err) => {
-        if (err) {
-            console.log(err.message)
-        }
-
-        console.log(`Echoed back : ${text}`)
-    })
-})
-http.createServer(bot.middleware()).listen(5000)
-console.log('Server is running.')
+const server = app.listen(process.env.PORT || 5000, () => {
+  console.log('Express server listening on port %d in %s mode', server.address().port, app.settings.env);
+});

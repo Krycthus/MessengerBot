@@ -1,28 +1,16 @@
-require('dotenv').config()
-
-const express = require('express');
-const bodyParser = require('body-parser');
+'use strict'
 const request = require('request');
-const app = express();
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-const server = app.listen(process.env.PORT || 5000, () => {
-  console.log('Express server listening on port %d in %s mode', server.address().port, app.settings.env);
-});
-
-/* For Facebook Validation */
-app.get('/webhook', (req, res) => {
+exports.getAuth = function(req, res){
   if (req.query['hub.mode'] && req.query['hub.verify_token'] === process.env.FB_VERIFY) {
     res.status(200).send(req.query['hub.challenge']);
   } else {
     res.status(403).end();
   }
-});
+};
 
 /* Handling all messenges */
-app.post('/webhook', (req, res) => {
+exports.postRes = function(req, res) {
   console.log(req.body.entry[0].messaging);
   if (req.body.object === 'page') {
     req.body.entry.forEach((entry) => {
@@ -34,7 +22,7 @@ app.post('/webhook', (req, res) => {
     });
     res.status(200).end();
   }
-});
+};
 
 function sendMessage(event) {
   let sender = event.sender.id;
