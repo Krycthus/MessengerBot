@@ -1,63 +1,87 @@
 'use strict'
-const request = require('request');
-const apiaiApp = require('apiai')(process.env.APIAI_TOKEN);
-console.log(process.env.APIAI_TOKEN)
 
-exports.getAuth = function(req, res){
-  if (req.query['hub.mode'] && req.query['hub.verify_token'] === process.env.FB_VERIFY) {
-    res.status(200).send(req.query['hub.challenge']);
+require ('dotenv').config
+
+import Paths from '../conf/paths'
+import Boom from 'boom'
+import Fetch from 'node-fetch'
+
+exports.getAuth = (request, reply) => {
+  if (request.query['hub.mode'] && request.query['hub.verify_token'] === process.env.FB_VERIFY) {
+    reply(request.query['hub.challenge'])
   } else {
-    res.status(403).end();
+    reply(Boom.badGateway())
   }
-};
+}
 
-/* Handling all messenges */
-exports.postRes = function(req, res) {
-  console.log(req.body.entry[0].messaging);
-  if (req.body.object === 'page') {
-    req.body.entry.forEach((entry) => {
+exports.postRes = (request, reply) => {
+  if (request.payload.object === 'page') {
+    request.payload.entry.forEach((entry) => {
       entry.messaging.forEach((event) => {
         if (event.message && event.message.text) {
-          sendMessage(event);
+          postMessage(event);
         }
       });
     });
-    res.status(200).end();
+    reply()
   }
-};
-
-function sendMessage(event) {
-  let sender = event.sender.id;
-  let text = event.message.text;
-
-  let apiai = apiaiApp.textRequest(text, {
-    sessionId: 'tabby_cat' // use any arbitrary id
-  });
-
-  apiai.on('response', (response) => {
-    // Got a response from api.ai. Let's POST to Facebook Messenger
-    let aiText = response.result.fulfillment.speech;
-
-    request({
-      url: 'https://graph.facebook.com/v2.6/me/messages',
-      qs: {access_token: process.env.FB_TOKEN},
-      method: 'POST',
-      json: {
-        recipient: {id: sender},
-        message: {text: aiText}
-      }
-    }, (error, response) => {
-      if (error) {
-          console.log('Error sending message: ', error);
-      } else if (response.body.error) {
-          console.log('Error: ', response.body.error);
-      }
-    });
-  });
-
-  apiai.on('error', (error) => {
-    console.log(error);
-  });
-
-  apiai.end();
+  else {
+    reply(Boom.notFound())
+  }
 }
+
+exports.replyMessage = (request, reply) =>{ 
+  sendMessage(request.payload)
+} 
+
+
+const postMessage = (event) => {
+  Fetch(Paths.extern.messagessService.postMessage(), {
+    method: 'POST',
+    body: JSON.stringify({
+      id: event.sender.id,
+      text: event.sender.text
+    })
+  })
+  .catch(error => console.log(error))
+}
+
+function sendMessage(message) {
+  console.log(message)
+  request({
+  url: Paths.extern.facebook.messages(),
+    qs: {access_token: process.env.FB_TOKEN},
+    method: 'POST',
+    json: {
+      recipient: {id: sender},
+      message: {text: aiText}
+    }
+  }, (error, response) => {
+    if (error) {
+        console.log('Error sending message: ', error);
+    } else if (response.body.error) {
+        console.log('Error: ', response.body.error);
+    }
+  });
+}
+
+/*
+let sender = event.sender.id;
+let text = event.message.text;
+
+let apiai = apiaiApp.textRequest(text, {
+  sessionId: 'tabby_cat' // use any arbitrary id
+});
+
+apiai.on('response', (response) => {
+  // Got a response from api.ai. Let's POST to Facebook Messenger
+  let aiText = response.result.fulfillment.speech;
+
+});
+
+apiai.on('error', (error) => {
+  console.log(error);
+});
+
+apiai.end();
+*/

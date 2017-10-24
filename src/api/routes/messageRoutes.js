@@ -1,9 +1,32 @@
 'use strict'
 
-module.exports = function(app) {
-  const message  = require('../controllers/messageControllers');
+import Paths from '../conf/paths'
+import Message from '../controllers/messageControllers'
+import Joi from 'joi'
 
-  app.route('/webhook')
-    .get(message.getAuth)
-    .post(message.postRes);
+module.exports = (server) => {
+
+  server.route({
+    method: 'GET',
+    path: Paths.intern.webhook,
+    handler: Message.getAuth,
+    config: {
+        tags: ['api']
+    }
+  })
+
+  server.route({
+    method: 'POST',
+    path: Paths.intern.webhook,
+    handler: Message.postRes,
+    config: {
+        tags: ['api']
+    }
+  })
+
+  server.route({
+    method: 'POST',
+    path: Paths.intern.reply,
+    handler: Message.replyMessage
+  })
 }
