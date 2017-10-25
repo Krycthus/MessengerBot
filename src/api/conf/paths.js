@@ -2,13 +2,11 @@
 
 require ('dotenv').config
 
-const path = process.env.PATH
-
 module.exports = {
 
     extern: {
 
-        messagessService : {
+        messagesService : {
             postMessage: () => 'http://localhost:4002/api/message'
         },
 
@@ -19,6 +17,6 @@ module.exports = {
 
     intern: {
         webhook: '/webhook',
-        reply: `${path}reply`
+        reply: `/api/reply`
     }
 }

@@ -5,6 +5,7 @@ require ('dotenv').config
 import Paths from '../conf/paths'
 import Boom from 'boom'
 import Fetch from 'node-fetch'
+import request from 'request'
 
 exports.getAuth = (request, reply) => {
   if (request.query['hub.mode'] && request.query['hub.verify_token'] === process.env.FB_VERIFY) {
@@ -32,29 +33,28 @@ exports.postRes = (request, reply) => {
 
 exports.replyMessage = (request, reply) =>{ 
   sendMessage(request.payload)
+  reply()
 } 
 
-
 const postMessage = (event) => {
-  Fetch(Paths.extern.messagessService.postMessage(), {
+  Fetch(Paths.extern.messagesService.postMessage(), {
     method: 'POST',
     body: JSON.stringify({
       id: event.sender.id,
-      text: event.sender.text
+      text: event.message.text
     })
   })
   .catch(error => console.log(error))
 }
 
 function sendMessage(message) {
-  console.log(message)
   request({
   url: Paths.extern.facebook.messages(),
     qs: {access_token: process.env.FB_TOKEN},
     method: 'POST',
     json: {
-      recipient: {id: sender},
-      message: {text: aiText}
+      recipient: {id: message.id},
+      message: {text: message.content}
     }
   }, (error, response) => {
     if (error) {
